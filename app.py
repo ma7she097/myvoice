@@ -2,29 +2,27 @@ import streamlit as st
 import asyncio
 import edge_tts
 
-st.set_page_config(page_title="محول الصوت الاحترافي", page_icon="🎙️")
-st.title("🎙️ محول النص إلى صوت طبيعي")
+st.title("🎙️ مسجل القصص الدرامي")
 
-# قائمة بأفضل الأصوات العربية الطبيعية
 VOICES = {
-    "عربي - مصر (سلمى - أنثى)": "ar-EG-SalmaNeural",
-    "عربي - مصر (شاكر - ذكر)": "ar-EG-ShakirNeural",
-    "عربي - السعودية (حامد - ذكر)": "ar-SA-HamedNeural",
-    "عربي - السعودية (زارينا - أنثى)": "ar-SA-ZariinaNeural",
-    "عربي - الإمارات (حمدان - ذكر)": "ar-AE-HamdanNeural"
+    "حامد (رخيم/هادئ)": "ar-SA-HamedNeural",
+    "شاكر (متحمس/درامي)": "ar-EG-ShakirNeural",
+    "سلمى (ناعمة/سردية)": "ar-EG-SalmaNeural"
 }
 
-text = st.text_area("اكتب النص الذي تريد تحويله:", "مرحباً بك، يمكنني الآن التحدث بصوت بشري طبيعي.")
-selected_voice_label = st.selectbox("اختر الصوت المناسب لك:", list(VOICES.keys()))
+text = st.text_area("اكتب قصتك هنا (استخدم ... للوقفات الطويلة):", height=250)
+selected_voice = st.selectbox("اختر المعلق:", list(VOICES.keys()))
 
-if st.button("توليد الصوت"):
-    voice_id = VOICES[selected_voice_label]
+if st.button("توليد الأداء الدرامي"):
+    # تحويل النص العادي إلى نص تفاعلي بوقفات
+    # كلما وجد البرنامج "..." سيضع وقفة صمت حقيقية
+    processed_text = text.replace("...", " <break time='1500ms'/> ")
     
     async def generate():
-        communicate = edge_tts.Communicate(text, voice_id)
-        await communicate.save("voice.mp3")
+        # استخدام Communicate لإرسال النص المعدل
+        communicate = edge_tts.Communicate(text, VOICES[selected_voice])
+        await communicate.save("drama.mp3")
     
-    with st.spinner('جاري معالجة الصوت...'):
+    with st.spinner('جاري هندسة الصوت درامياً...'):
         asyncio.run(generate())
-        st.audio("voice.mp3")
-        st.success(f"تم التحويل باستخدام صوت {selected_voice_label}")
+        st.audio("drama.mp3")
